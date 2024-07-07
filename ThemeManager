@@ -247,5 +247,3 @@ local ThemeManager = {} do
 end
 
 return ThemeManager
-
-return ThemeManager
