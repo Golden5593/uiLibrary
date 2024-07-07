@@ -3612,18 +3612,35 @@ function Library:CreateWindow(...)
         end
     end))]]
 
+    local function getLowerCaseKey(input)
+    if input.UserInputType == Enum.UserInputType.Keyboard then
+        local keyCode = input.KeyCode.Value
+        if keyCode >= 97 and keyCode <= 122 then  -- a to z
+            return string.char(keyCode)
+        elseif keyCode >= 65 and keyCode <= 90 then  -- A to Z
+            return string.char(keyCode + 32)  -- Convert to lowercase
+        else
+            return nil
+        end
+    end
+        return nil
+    end
+
     Library:GiveSignal(InputService.InputBegan:Connect(function(Input, Processed)
-        if type(Library.ToggleKeybind) == 'table' and Library.ToggleKeybind.Type == 'KeyPicker' then
-            if Input.UserInputType == Enum.UserInputType.Keyboard then
-                local key = string.lower(Input.KeyCode.Name)
-                if key == string.lower(Library.ToggleKeybind.Value) then
+        local lowerCaseKey = getLowerCaseKey(Input)
+        if lowerCaseKey then
+            if type(Library.ToggleKeybind) == 'table' and Library.ToggleKeybind.Type == 'KeyPicker' then
+                if lowerCaseKey == string.lower(Library.ToggleKeybind.Value) then
                     task.spawn(Library.Toggle)
                 end
+            elseif lowerCaseKey == "rightcontrol" or (lowerCaseKey == "rightshift" and not Processed) then
+                task.spawn(Library.Toggle)
             end
-        elseif Input.KeyCode == Enum.KeyCode.RightControl or (Input.KeyCode == Enum.KeyCode.RightShift and (not Processed)) then
-            task.spawn(Library.Toggle)
         end
-    end))
+end))
+
+
+
 
     if Config.AutoShow then task.spawn(Library.Toggle) end
 
